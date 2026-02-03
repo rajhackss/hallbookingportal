@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grandeur Hall - Exclusive Event Venue</title>
+    <title>Hall Booking Portal</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,7 @@
         rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=3">
 
     <!-- Font Awesome for Icons (using CDN) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,7 +28,8 @@
         <ul class="nav-links">
             <li><a href="#home">Home</a></li>
             <li><a href="#details">The Hall</a></li>
-            <li><a href="#booking">Book Now</a></li>
+            <li id="nav-booking-item"><a href="#booking">Book Now</a></li>
+            <li><a href="#my-bookings" onclick="showMyBookingsView()">My Bookings</a></li>
             <li><a href="#reviews">Reviews</a></li>
             <li><a href="#support">Support</a></li>
         </ul>
@@ -50,7 +51,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 
 </html>
