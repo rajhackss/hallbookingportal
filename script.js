@@ -404,8 +404,20 @@ function initAvailabilityCheck() {
     const checkBtn = document.getElementById('checkBtn');
     if (!checkBtn) return;
 
+    // Set Min Date to Tomorrow
+    const dateInput = document.getElementById('checkDate');
+    if (dateInput) {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const yyyy = tomorrow.getFullYear();
+        const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        const dd = String(tomorrow.getDate()).padStart(2, '0');
+        dateInput.min = `${yyyy}-${mm}-${dd}`;
+    }
+
     checkBtn.addEventListener('click', () => {
-        const dateInput = document.getElementById('checkDate');
+        // existing logic...
         const slotGrid = document.getElementById('slotSelection');
         const formContainer = document.getElementById('bookingFormContainer');
         const msgDiv = document.getElementById('slotMessage');
