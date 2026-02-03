@@ -5,7 +5,7 @@ const halls = [
         name: "Sarjerao Yadav Multipurpose Hall & Lawn",
         address: "Bahe Rd, near SONA Chemicals, MIDC, Ishwarpur, Maharashtra 415409",
         capacity: "500 Guests",
-        price: "₹80,000 / Day",
+        price: "₹70,000 / Day",
         description: "A grand multipurpose hall with an expansive lawn, perfect for massive wedding receptions and public gatherings.",
         images: ["hall1.jpg", "hall11.jpg", "hall111.jpg"],
         facilities: ["Expansive Lawn", "Large Stage", "Ample Parking", "Dining Hall"],
@@ -31,8 +31,8 @@ const halls = [
         id: 3,
         name: "Mankeshwar Multi-purpose Hall & Lawns",
         address: "Kore Appa Nagar, Kreshar Road, Shastri Nagar, Kisannagar, Ishwarpur, Maharashtra 415409",
-        capacity: "400 Guests",
-        price: "₹45,000 / Day",
+        capacity: "500 Guests",
+        price: "₹50,000 / Day",
         description: "A modern facility located in a prime residential area, offering a blend of indoor comfort and outdoor freshness.",
         images: ["hall3.jpg", "hall33.jpg", "hall333.jpg"],
         facilities: ["Modern Acoustics", "Central Location", "AC Rooms", "Garden Area", "Valet Parking"],
@@ -45,8 +45,8 @@ const halls = [
         id: 4,
         name: "Akshay Multipurpose Hall",
         address: "Waghwadi Phata, Ishwarpur, Maharashtra 415409",
-        capacity: "700 Guests",
-        price: "₹60000 / Day",
+        capacity: "800 Guests",
+        price: "₹65,000 / Day",
         description: "A cozy and budget-friendly hall ideal for intimate weddings, birthday parties, and corporate functions.",
         images: ["hall4.jpg", "hall44.jpg", "hall444.jpg"],
         facilities: ["Budget Friendly", "Intimate Setting", "Stage Decor", "Sound System", "Changing Rooms"],
@@ -58,21 +58,40 @@ const halls = [
 
 // State
 let currentHall = null;
-const bookedDates = ["2026-02-14", "2026-02-20", "2026-03-01"];
+let currentSlot = null; // Track selected slot
+
+// Detailed Booking Records for "My Bookings"
+// Structure: { id: "HB-1234", hallId: 1, date: "2026-02-14", slot: "Morning", name: "John", status: "Confirmed" }
+const bookingRecords = [
+    { id: "HB-9988", hallId: 1, date: "2026-02-14", slot: "Morning", name: "Demo User", status: "Confirmed" }
+];
+
+// Mock Booking Data: { "YYYY-MM-DD": ["Morning", "Evening"] }
+const bookings = {
+    "2026-02-14": ["Morning", "Evening"],
+    "2026-02-20": ["Night"],
+    "2026-03-01": ["Morning", "Evening", "Night"] // Fully booked
+};
+const slotsArray = ["Morning", "Evening", "Night"];
 
 document.addEventListener('DOMContentLoaded', () => {
     initNav();
-    showHome(); // Initial View
+    showHome();
 });
 
-// Routing / Navigation Logic
+// Routing
 function showHome() {
+    setNavVisibility(false); // RESTORE NAV
     currentHall = null;
     const app = document.getElementById('app-content');
+
+    // Hide Book Now on Home (Specific override)
+    const navBooking = document.getElementById('nav-booking-item');
+    if (navBooking) navBooking.style.display = 'none';
+
     window.scrollTo(0, 0);
 
     let html = `
-        <!-- Hero Section -->
         <header id="home" class="hero-section" style="background-image: url('hall1.jpg');">
             <div class="hero-overlay"></div>
             <div class="hero-content fade-in">
@@ -108,12 +127,11 @@ function showHome() {
         `;
     });
 
-    // Add Global Sections (Usage: User can browse general info here, or click hall for specific info)
     html += `
             </div>
         </section>
 
-        <!-- Global Reviews Preview -->
+        <!-- Global Sections -->
         <section id="reviews" class="section-container alt-bg">
             <div class="section-title">
                 <h2>What Guests Say</h2>
@@ -133,7 +151,6 @@ function showHome() {
             </div>
         </section>
 
-        <!-- Support Section -->
         <section id="support" class="section-container">
             <div class="section-title">
                 <h2>Support & Contact</h2>
@@ -142,29 +159,73 @@ function showHome() {
             <div class="support-wrapper">
                 <div class="support-card glass-card">
                     <i class="fas fa-headset"></i>
-                    <h3>Live Assistance</h3>
-                    <p>Issues with booking? Let us help.</p>
-                    <button class="btn btn-outline" id="liveChatBtn" onclick="showNotification('Live Chat Connected (Demo)')">Start Chat</button>
+                    <h3>Contact Us</h3>
+                    <p style="margin-bottom: 0.5rem;"><i class="fas fa-phone-alt"></i> +91 8010253647</p>
+                    <p style="margin-bottom: 0.5rem;"><i class="fas fa-envelope"></i> vaishnavipatil1459@gmail.com</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;"><i class="fas fa-clock"></i> 10:00 AM - 5:00 PM</p>
+                    <button class="btn btn-outline" onclick="showNotification('Calling Support...')" style="margin-top: 1rem;">Call Now</button>
                 </div>
                 
-                <!-- Complaint Form -->
                 <div class="glass-card complaint-form-wrapper">
                     <h3>Raise an Issue / Complaint</h3>
                     <div class="complaint-form">
                         <textarea id="complaintText" placeholder="Describe your issue..."></textarea>
-                        <button class="btn btn-secondary" onclick="submitComplaint()">Submit Complaint</button>
+                        <button class="btn btn-secondary" onclick="window.submitComplaint()">Submit Complaint</button>
                     </div>
                 </div>
 
                 <div class="location-card glass-card">
                     <i class="fas fa-map-pin"></i>
-                    <h3>Location</h3>
-                    <p>Ishwarpur</p>
-                    <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-                        <h4>Manage Booking</h4>
-                        <input type="text" placeholder="Booking ID" style="padding: 0.5rem; width: 100%; border-radius: 4px; margin-bottom: 0.5rem; background: var(--secondary); border: 1px solid var(--glass-border); color: white;">
-                        <button class="btn btn-outline full-width" onclick="cancelBooking()">Cancel Booking</button>
-                        <p class="refund-policy" style="font-size: 0.8rem; margin-top: 0.5rem;">See Refund Policy below.</p>
+                    <h3>Manage Booking</h3>
+                    <p style="margin-bottom: 1rem;">Have a booking ID? Manage it here.</p>
+                    <input type="text" id="bookingIdInput" placeholder="Enter Booking ID (e.g. HB-1234)" style="padding: 0.5rem; width: 100%; border-radius: 4px; margin-bottom: 0.5rem; background: var(--secondary); border: 1px solid var(--glass-border); color: white;">
+                    <button class="btn btn-outline full-width" onclick="window.cancelBooking()">Cancel Booking</button>
+                    <p class="refund-policy" style="font-size: 0.8rem; margin-top: 0.5rem;">Cancellation allowed 7 days prior.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="section-container alt-bg">
+            <div class="section-title">
+                <h2>Frequently Asked Questions</h2>
+                <div class="underline"></div>
+            </div>
+            <div class="faq-grid" style="max-width: 800px; margin: 0 auto;">
+                <div class="glass-card faq-item" onclick="this.classList.toggle('active')">
+                    <div class="faq-question">
+                        <h4><i class="fas fa-question-circle"></i> What is the cancellation policy?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You can cancel your booking up to 7 days before the event date for a 50% refund. Cancellations made within 7 days are non-refundable.</p>
+                    </div>
+                </div>
+                <div class="glass-card faq-item" onclick="this.classList.toggle('active')">
+                    <div class="faq-question">
+                        <h4><i class="fas fa-question-circle"></i> Is parking available at the venues?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, all our venues come with ample parking space for guests. Specific capacity details are listed on each hall's page.</p>
+                    </div>
+                </div>
+                <div class="glass-card faq-item" onclick="this.classList.toggle('active')">
+                    <div class="faq-question">
+                        <h4><i class="fas fa-question-circle"></i> Do you provide catering services?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Some venues like 'Indira Palace' offer in-house catering. For others, we can recommend trusted vendor partners.</p>
+                    </div>
+                </div>
+                 <div class="glass-card faq-item" onclick="this.classList.toggle('active')">
+                    <div class="faq-question">
+                        <h4><i class="fas fa-question-circle"></i> How do I get my Booking ID?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Your unique Booking ID (e.g., HB-1234) is generated instantly after you confirm your payment. Please save it for tracking.</p>
                     </div>
                 </div>
             </div>
@@ -172,27 +233,31 @@ function showHome() {
     `;
 
     app.innerHTML = html;
+    initGlobalValidators();
 }
 
 function showHallDetails(id) {
+    setNavVisibility(false); // RESTORE NAV
     const hall = halls.find(h => h.id === id);
     if (!hall) return;
     currentHall = hall;
+    currentSlot = null; // Reset slot
+
+    // Show Book Now on Details
+    const navBooking = document.getElementById('nav-booking-item');
+    if (navBooking) navBooking.style.display = 'block';
 
     const app = document.getElementById('app-content');
     window.scrollTo(0, 0);
 
-    // Facilities HTML
     const facilitiesHtml = hall.facilities.map(f => `
         <div class="facility-item"><i class="fas fa-check-circle"></i> ${f}</div>
     `).join('');
 
-    // Gallery HTML
     const galleryHtml = hall.images.map(img => `
         <div class="gallery-item" style="background-image: url('${img}');" onclick="window.open('${img}', '_blank')"></div>
     `).join('');
 
-    // Reviews HTML
     const reviewsHtml = hall.reviews.map(r => `
         <div class="review-card glass-card">
             <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
@@ -202,7 +267,6 @@ function showHallDetails(id) {
     `).join('');
 
     app.innerHTML = `
-        <!-- Hall Hero -->
         <header class="hero-section" style="background-image: url('${hall.images[0]}'); height: 60vh;">
             <div class="hero-overlay"></div>
             <div class="hero-content fade-in">
@@ -212,7 +276,6 @@ function showHallDetails(id) {
             </div>
         </header>
 
-        <!-- Details -->
         <section class="section-container">
             <div class="details-grid">
                 <div class="detail-card glass-card">
@@ -232,7 +295,6 @@ function showHallDetails(id) {
                 </div>
             </div>
 
-            <!-- Gallery -->
             <div class="glass-panel" style="padding: 2rem; border-radius: 8px;">
                 <h3>Photo Gallery</h3>
                 <div class="gallery-grid">
@@ -248,7 +310,6 @@ function showHallDetails(id) {
             </div>
         </section>
 
-        <!-- Booking Section -->
         <section id="booking" class="section-container booking-section" style="background-image: url('${hall.images[1] || hall.images[0]}');">
              <div class="section-title">
                 <h2>Book ${hall.name}</h2>
@@ -256,43 +317,58 @@ function showHallDetails(id) {
             </div>
             <div class="booking-wrapper glass-panel">
                 <div class="availability-check">
-                    <h3>Check Availability</h3>
+                    <h3>Select Date & Slot</h3>
                     <div class="check-form">
                         <input type="date" id="checkDate">
-                        <button id="checkBtn" class="btn btn-secondary">Check Status</button>
+                        <button id="checkBtn" class="btn btn-secondary">Show Slots</button>
                     </div>
-                    <div id="availabilityResult" class="result-message"></div>
+                    
+                    <!-- Slot Grid -->
+                    <div id="slotSelection" class="slots-grid hidden">
+                        <!-- Slots injected here -->
+                    </div>
+                    <div id="slotMessage" class="result-message" style="margin-top: 1rem;"></div>
                 </div>
 
                 <div id="bookingFormContainer" class="booking-form-container hidden">
                     <h3>Confirm Booking</h3>
+                    <div class="selected-slot-info" style="margin-bottom: 1rem; color: var(--primary); font-weight: bold;"></div>
                     <form id="bookingForm">
                         <div class="form-group">
                             <label>Full Name</label>
-                            <input type="text" id="fullName" required>
+                            <input type="text" id="fullName" required placeholder="Alphabets only">
                         </div>
                         <div class="form-group">
                             <label>Contact</label>
-                            <input type="tel" id="contact" required>
+                            <input type="tel" id="contact" required placeholder="Numbers only">
                         </div>
-                         <div class="payment-selection">
+                        <div class="payment-selection">
                             <h4>Payment Method</h4>
                             <div class="payment-options">
                                 <label class="radio-container">UPI
-                                    <input type="radio" name="payment" value="upi" checked><span class="checkmark"></span>
+                                    <input type="radio" name="payment" value="upi" checked onchange="togglePaymentDetails()"><span class="checkmark"></span>
                                 </label>
                                 <label class="radio-container">Card
-                                    <input type="radio" name="payment" value="card"><span class="checkmark"></span>
+                                    <input type="radio" name="payment" value="card" onchange="togglePaymentDetails()"><span class="checkmark"></span>
                                 </label>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary full-width">Pay & Book</button>
+                        
+                        <!-- Dynamic Payment Details -->
+                        <div id="payment-details-section" style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 4px; text-align: center;">
+                            <!-- Default to UPI content -->
+                            <img src="upi_qr.png" alt="Scan to Pay" style="width: 150px; border-radius: 8px; margin-bottom: 0.5rem; border: 2px solid white;">
+                            <p style="font-size: 0.9rem; color: var(--primary);">Scan & Pay to Confirm</p>
+                            <input type="text" id="utrNumber" placeholder="Enter UTR / Transaction No." required 
+                                   style="width: 100%; padding: 0.8rem; margin-top: 0.5rem; border-radius: 4px; border: 1px solid var(--glass-border); background: var(--secondary); color: white;">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary full-width" style="margin-top: 1rem;">Pay & Book</button>
                     </form>
                 </div>
             </div>
         </section>
 
-        <!-- Reviews -->
         <section class="section-container alt-bg">
             <div class="section-title">
                 <h2>Reviews</h2>
@@ -303,64 +379,168 @@ function showHallDetails(id) {
             </div>
         </section>
 
-         <!-- Footer info -->
          <section class="section-container" style="text-align: center;">
             <p><strong>Address:</strong> ${hall.address}</p>
             <p class="refund-policy" style="margin-top: 1rem; color: #8892b0;">Cancellation Policy: 50% refund if cancelled 7 days prior.</p>
          </section>
     `;
 
-    // Re-attach listeners for the new DOM elements
     initAvailabilityCheck();
     initBookingForm();
 }
 
-// Logic Functions
+// Logic: Validators
+function initGlobalValidators() {
+    const bookingId = document.getElementById('bookingIdInput');
+    if (bookingId) {
+        bookingId.addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    }
+}
+
+// Logic: Slot Booking
 function initAvailabilityCheck() {
     const checkBtn = document.getElementById('checkBtn');
     if (!checkBtn) return;
 
     checkBtn.addEventListener('click', () => {
         const dateInput = document.getElementById('checkDate');
-        const resultDiv = document.getElementById('availabilityResult');
-        const bookingForm = document.getElementById('bookingFormContainer');
+        const slotGrid = document.getElementById('slotSelection');
+        const formContainer = document.getElementById('bookingFormContainer');
+        const msgDiv = document.getElementById('slotMessage');
         const date = dateInput.value;
 
         if (!date) {
-            resultDiv.textContent = "Please select a date.";
-            resultDiv.className = "result-message error";
+            msgDiv.textContent = "Please select a date first.";
+            msgDiv.className = "result-message error";
             return;
         }
 
-        checkBtn.textContent = "Checking...";
+        checkBtn.textContent = "Loading Slots...";
         checkBtn.disabled = true;
 
         setTimeout(() => {
-            checkBtn.textContent = "Check Status";
+            checkBtn.textContent = "Update Slots";
             checkBtn.disabled = false;
+            slotGrid.innerHTML = '';
+            slotGrid.classList.remove('hidden');
+            formContainer.classList.add('hidden');
+            currentSlot = null;
 
-            if (bookedDates.includes(date)) {
-                resultDiv.textContent = `Unavailable on ${date}.`;
-                resultDiv.className = "result-message error";
-                bookingForm.classList.add('hidden');
-            } else {
-                resultDiv.textContent = `Available! Proceed to book.`;
-                resultDiv.className = "result-message success";
-                bookingForm.classList.remove('hidden');
-            }
-        }, 800);
+            const bookedSlots = bookings[date] || [];
+
+            slotsArray.forEach(slot => {
+                const isBooked = bookedSlots.includes(slot);
+                const btn = document.createElement('div');
+                btn.className = `slot-card ${isBooked ? 'booked' : 'available'}`;
+                btn.innerHTML = `<i class="fas ${getSlotIcon(slot)}"></i><br>${slot}`;
+
+                if (isBooked) {
+                    btn.title = "Already Booked";
+                } else {
+                    btn.onclick = () => selectSlot(btn, slot, date);
+                }
+
+                slotGrid.appendChild(btn);
+            });
+
+            msgDiv.textContent = "Select an available slot.";
+            msgDiv.className = "result-message";
+        }, 500);
     });
 }
+
+function getSlotIcon(slot) {
+    if (slot === 'Morning') return 'fa-sun';
+    if (slot === 'Evening') return 'fa-cloud-sun';
+    return 'fa-moon';
+}
+
+function selectSlot(element, slot, date) {
+    document.querySelectorAll('.slot-card').forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+    currentSlot = slot;
+
+    const formContainer = document.getElementById('bookingFormContainer');
+    formContainer.classList.remove('hidden');
+
+    const info = formContainer.querySelector('.selected-slot-info');
+    info.textContent = `Booking for: ${date} (${slot})`;
+
+    formContainer.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Handle Payment Method Toggle
+window.togglePaymentDetails = function () {
+    const method = document.querySelector('input[name="payment"]:checked').value;
+    const container = document.getElementById('payment-details-section');
+
+    if (method === 'upi') {
+        container.innerHTML = `
+            <img src="upi_qr.png" alt="Scan to Pay" style="width: 150px; border-radius: 8px; margin-bottom: 0.5rem; border: 2px solid white;">
+            <p style="font-size: 0.9rem; color: var(--primary);">Scan & Pay to Confirm</p>
+            <input type="text" id="utrNumber" placeholder="Enter 12-digit UTR No." required maxlength="12"
+                   oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()"
+                   style="width: 100%; padding: 0.8rem; margin-top: 0.5rem; border-radius: 4px; border: 1px solid var(--glass-border); background: var(--secondary); color: white; letter-spacing: 1px;">
+        `;
+    } else {
+        container.innerHTML = `
+            <i class="fas fa-credit-card" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-muted);"></i>
+            <p>Please pay at the Card Terminal at the venue office.</p>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Booking will be tentative until payment.</p>
+        `;
+    }
+};
 
 function initBookingForm() {
     const form = document.getElementById('bookingForm');
     if (!form) return;
 
+    const nameInput = document.getElementById('fullName');
+    const contactInput = document.getElementById('contact');
+
+    if (nameInput) {
+        nameInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[^A-Za-z\s]/g, '');
+        });
+    }
+
+    if (contactInput) {
+        contactInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    }
+
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         const date = document.getElementById('checkDate').value;
-        const name = document.getElementById('fullName').value;
-        const contact = document.getElementById('contact').value;
+        const name = nameInput.value;
+        const contact = contactInput.value;
+        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+        if (!currentSlot) {
+            showNotification("Please select a time slot.", "error");
+            return;
+        }
+
+        if (contact.length < 10) {
+            showNotification("Contact number must be at least 10 digits.", "error");
+            return;
+        }
+        if (name.length < 2) {
+            showNotification("Please enter a valid name.", "error");
+            return;
+        }
+
+        // UTR Check
+        if (paymentMethod === 'upi') {
+            const utr = document.getElementById('utrNumber').value;
+            if (!utr || utr.length !== 12) {
+                showNotification("UTR number must be exactly 12 alphanumeric characters.", "error");
+                return;
+            }
+        }
 
         const btn = form.querySelector('button[type="submit"]');
         btn.textContent = "Processing...";
@@ -370,14 +550,47 @@ function initBookingForm() {
             btn.textContent = "Pay & Book";
             btn.disabled = false;
 
-            bookedDates.push(date);
-            showNotification(`Booking Confirmed! Confirmation sent to ${contact}.`);
+            // Register booking
+            if (!bookings[date]) bookings[date] = [];
+            bookings[date].push(currentSlot);
 
-            // Go back home or reset
+            // Generate ID and Save Record
+            const bookingId = "HB-" + Math.floor(1000 + Math.random() * 9000);
+            bookingRecords.push({
+                id: bookingId,
+                hallId: currentHall.id,
+                date: date,
+                slot: currentSlot,
+                name: name,
+                status: "Confirmed"
+            });
+
+            showNotification(`Booking Confirmed! ID: ${bookingId}`);
+
+            // Show Success Modal / Details
+            const formContainer = document.getElementById('bookingFormContainer');
+            formContainer.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                    <h3>Booking Successful!</h3>
+                    <p style="font-size: 1.2rem; margin: 1rem 0;">Your Booking ID: <strong style="color: var(--primary);">${bookingId}</strong></p>
+                    <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; padding: 0.5rem; border-radius: 4px; margin: 1rem 0;">
+                        <p style="color: #ff6b6b; font-size: 0.9rem; margin: 0;"><strong>⚠️ IMPORTANT:</strong> Copy this Booking ID now.<br>You valid need it to <strong>Track Status</strong> or <strong>Cancel Booking</strong>.</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="showMyBookingsView()">Track Booking</button>
+                </div>
+            `;
+
+            // Reset UI
             form.reset();
+            // Reset Payment UI
+            window.togglePaymentDetails();
+
             document.getElementById('bookingFormContainer').classList.add('hidden');
-            document.getElementById('availabilityResult').textContent = '';
+            document.getElementById('slotSelection').innerHTML = '';
+            document.getElementById('slotSelection').classList.add('hidden');
             document.getElementById('checkDate').value = '';
+            document.getElementById('slotMessage').textContent = '';
         }, 1500);
     });
 }
@@ -396,18 +609,52 @@ function initNav() {
                 nav.style.background = 'rgba(10, 25, 47, 0.95)';
                 nav.style.width = '100%';
                 nav.style.padding = '2rem';
+                nav.style.zIndex = '1000';
             }
         });
     }
 
-    // Nav Links Handling
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default anchor jump
+            const targetId = link.getAttribute('href').substring(1);
+
+            // Close mobile menu if open
+            if (window.innerWidth <= 768 && nav.style.display === 'flex') {
+                nav.style.display = 'none';
+            }
+
+            if (targetId === 'home') {
+                showHome();
+                return;
+            }
+
+            // Logic: If on Details Page, and target is Global (Reviews, Support, Halls) -> Go Home first
             if (currentHall) {
-                // If in details view, some links like #support might strictly mean the global support?
-                // For now, let's allow jumping to Home if clicking "Home"
-                if (link.getAttribute('href') === '#home') {
-                    showHome();
+                // If clicking Booking or Details on Details page, scroll if element exists
+                if ((targetId === 'booking' || targetId === 'details') && document.getElementById(targetId)) {
+                    document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
+                    return;
+                }
+
+                // Otherwise switch to Home
+                showHome();
+
+                // Then scroll after render
+                setTimeout(() => {
+                    const section = document.getElementById(targetId) || document.getElementById('halls-list'); // Fallback to halls list
+                    if (section) section.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            } else {
+                // On Home Page
+                if (targetId === 'details' || targetId === 'booking') {
+                    // "The Hall" or "Book Now" on Home page -> Go to Halls List
+                    const list = document.getElementById('halls-list');
+                    if (list) list.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    // Reviews, Support, etc.
+                    const section = document.getElementById(targetId);
+                    if (section) section.scrollIntoView({ behavior: 'smooth' });
                 }
             }
         });
@@ -418,12 +665,23 @@ function showNotification(msg, type = 'success') {
     const notif = document.getElementById('notification');
     if (!notif) return;
     const content = document.getElementById('notificationMessage');
+    const icon = notif.querySelector('i');
+
     content.textContent = msg;
+
+    if (type === 'error') {
+        icon.className = 'fas fa-exclamation-circle';
+        icon.style.color = '#ff6b6b';
+    } else {
+        icon.className = 'fas fa-check-circle';
+        icon.style.color = '#64ffda';
+    }
+
     notif.classList.remove('hidden');
     setTimeout(() => notif.classList.add('hidden'), 4000);
 }
 
-// Global Actions (Exposed to Global Scope for HTML onclick)
+// Global Exports
 window.submitComplaint = function () {
     const text = document.getElementById('complaintText').value;
     if (!text.trim()) {
@@ -435,9 +693,129 @@ window.submitComplaint = function () {
 };
 
 window.cancelBooking = function () {
-    showNotification("Booking Cancelled. Refund processed (if eligible).");
+    const id = document.getElementById('bookingIdInput').value;
+    if (!id) {
+        showNotification("Please enter a Booking ID.", "error");
+        return;
+    }
+    showNotification(`Booking ${id} Cancelled. Refund processed.`);
+    document.getElementById('bookingIdInput').value = '';
+};
+
+// Helper: Control Nav Visibility
+function setNavVisibility(restricted) {
+    const links = document.querySelectorAll('.nav-links li a');
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        const parent = link.parentElement;
+
+        if (restricted) {
+            // In My Bookings: Hide everything except Home (and logically My Bookings active state)
+            if (href === '#home') {
+                parent.style.display = 'block';
+            } else {
+                parent.style.display = 'none';
+            }
+        } else {
+            // Restore: Show all standard links
+            // Note: Book Now (#booking) is handled separately by showHome/showDetails logic
+            if (href !== '#booking') {
+                parent.style.display = 'block';
+            }
+        }
+    });
+}
+
+function showMyBookingsView() {
+    currentHall = null;
+    setNavVisibility(true); // RESTRICT NAV
+
+    const app = document.getElementById('app-content');
+    window.scrollTo(0, 0);
+
+    app.innerHTML = `
+        <header class="hero-section" style="background-image: url('hall4.jpg'); height: 50vh;">
+            <div class="hero-overlay"></div>
+            <div class="hero-content fade-in">
+                <h1>My Bookings</h1>
+                <p>Manage your events and track status.</p>
+            </div>
+        </header>
+
+        <section class="section-container">
+            <div class="glass-panel" style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center;">
+                <h3>Find Your Booking</h3>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <input type="text" id="searchBookingId" placeholder="Enter Booking ID (e.g., HB-1234)" 
+                           style="flex: 1; padding: 0.8rem; border-radius: 4px; border: 1px solid var(--glass-border); background: var(--secondary); color: white;">
+                    <button class="btn btn-primary" onclick="searchBooking()">Search</button>
+                </div>
+                <div id="bookingResult" style="margin-top: 2rem;"></div>
+            </div>
+        </section>
+    `;
+}
+
+window.searchBooking = function () {
+    const id = document.getElementById('searchBookingId').value.trim();
+    const resultDiv = document.getElementById('bookingResult');
+
+    if (!id) {
+        showNotification("Please enter a Booking ID.", "error");
+        return;
+    }
+
+    const record = bookingRecords.find(r => r.id === id);
+
+    if (!record) {
+        resultDiv.innerHTML = `<p style="color: #ff6b6b;">No booking found with ID: ${id}</p>`;
+        return;
+    }
+
+    const hall = halls.find(h => h.id === record.hallId);
+
+    // Status Badge Color
+    const statusColor = record.status === 'Confirmed' ? '#64ffda' : '#ff6b6b';
+
+    resultDiv.innerHTML = `
+        <div class="glass-card" style="text-align: left; animation: fadeIn 0.5s;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                <h3 style="margin: 0;">${record.id}</h3>
+                <span style="background: ${statusColor}20; color: ${statusColor}; padding: 0.2rem 0.8rem; border-radius: 12px; font-size: 0.8rem;">${record.status}</span>
+            </div>
+            <p><strong>Hall:</strong> ${hall ? hall.name : 'Unknown Hall'}</p>
+            <p><strong>Date:</strong> ${record.date}</p>
+            <p><strong>Slot:</strong> ${record.slot}</p>
+            <p><strong>Booked By:</strong> ${record.name}</p>
+            
+            ${record.status === 'Confirmed' ?
+            `<button onclick="window.cancelBookingById('${record.id}')" class="btn btn-outline full-width" style="margin-top: 1.5rem; border-color: #ff6b6b; color: #ff6b6b;">Cancel Booking</button>
+                 <p class="refund-policy" style="font-size: 0.8rem; margin-top: 0.5rem; text-align: center;">Cancellation valid 7 days before event.</p>`
+            :
+            `<p style="margin-top: 1rem; color: #8892b0; font-style: italic;">This booking has been cancelled.</p>`
+        }
+        </div>
+    `;
+};
+
+window.cancelBookingById = function (id) {
+    if (!confirm("Are you sure you want to cancel this booking?")) return;
+
+    const record = bookingRecords.find(r => r.id === id);
+    if (record) {
+        record.status = "Cancelled";
+
+        // Free up slot in main database
+        if (bookings[record.date]) {
+            bookings[record.date] = bookings[record.date].filter(s => s !== record.slot);
+        }
+
+        showNotification(`Booking ${id} Cancelled Successfully.`);
+        window.searchBooking(); // Refresh view
+    }
 };
 
 window.showHome = showHome;
 window.showHallDetails = showHallDetails;
 window.showNotification = showNotification;
+window.showMyBookingsView = showMyBookingsView;
