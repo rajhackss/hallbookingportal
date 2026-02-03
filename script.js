@@ -357,7 +357,7 @@ function showHallDetails(id) {
                         <!-- Dynamic Payment Details -->
                         <div id="payment-details-section" style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 4px; text-align: center;">
                             <!-- Default to UPI content -->
-                            <img src="upi_qr.png" alt="Scan to Pay" style="width: 150px; border-radius: 8px; margin-bottom: 0.5rem; border: 2px solid white;">
+                            <img src="upi_qr.png" alt="Scan to Pay" style="width: 350px; border-radius: 8px; margin-bottom: 0.5rem; border: 2px solid white;">
                             <p style="font-size: 0.9rem; color: var(--primary);">Scan & Pay to Confirm</p>
                             <input type="text" id="utrNumber" placeholder="Enter UTR / Transaction No." required 
                                    style="width: 100%; padding: 0.8rem; margin-top: 0.5rem; border-radius: 4px; border: 1px solid var(--glass-border); background: var(--secondary); color: white;">
@@ -831,3 +831,4 @@ window.showHome = showHome;
 window.showHallDetails = showHallDetails;
 window.showNotification = showNotification;
 window.showMyBookingsView = showMyBookingsView;
+
