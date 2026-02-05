@@ -558,31 +558,22 @@ function initBookingForm() {
         btn.textContent = "Processing...";
         btn.disabled = true;
 
-        // 1. Insert into Supabase
-        if (supabaseClient) {
-            const { data, error } = await supabaseClient
-                .from('bookings')
-                .insert([
-                    {
-                        hall_id: currentHall.id,
-                        booking_date: currentSelectedDate,
-                        slot: currentSlot,
-                        customer_name: name,
-                        contact_number: contact
-                    }
-                ]);
+        // 1. Save to Session Storage (Pending)
+        const bookingDetails = {
+            hall_id: currentHall.id,
+            booking_date: currentSelectedDate,
+            slot: currentSlot,
+            customer_name: name,
+            contact_number: contact,
+            status: 'Confirmed'
+        };
+        sessionStorage.setItem('pendingBooking', JSON.stringify(bookingDetails));
 
-            if (error) {
-                console.error("Booking Error:", error);
-                showNotification("Booking Failed: " + error.message, "error");
-                btn.textContent = originalText;
-                btn.disabled = false;
-                return;
-            }
-        }
-
-        // 2. Open Payment Link
-        window.open("https://rzp.io/rzp/0q8HRbK", "_blank");
+        // 2. Open Payment Link (Redirect Mechanism)
+        // We open in _self so that when they finish payment, the redirect URL (success.html) loads in this tab 
+        // effectively guiding them through the flow.
+        // NOTE: If using a popup link, logic differs. For direct link, this is best.
+        window.location.href = "https://rzp.io/rzp/GwxrbTU";
 
         // 3. Show Success & Reset
         showNotification("Booking Confirmed!");
