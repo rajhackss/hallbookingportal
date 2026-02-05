@@ -656,28 +656,261 @@ footer {
     align-items: center;
     gap: 0.4rem;
 }
+
 /* Gallery */
-.gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; margin-bottom: 2rem; }
-.gallery-item { height: 180px; background-size: cover; background-position: center; border-radius: 8px; cursor: pointer; border: 1px solid var(--glass-border); transition: var(--transition); }
-.gallery-item:hover { transform: scale(1.05); }
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.gallery-item {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid var(--glass-border);
+    transition: var(--transition);
+}
+
+.gallery-item:hover {
+    transform: scale(1.05);
+}
 
 /* Complaint Form */
-.complaint-form-wrapper { padding: 2rem; background: var(--secondary-light); border-radius: 8px; margin-top: 2rem; }
-.complaint-form textarea { width: 100%; height: 120px; background: var(--secondary); border: 1px solid var(--glass-border); color: var(--text-light); padding: 1rem; border-radius: 4px; resize: none; margin-bottom: 1rem; }
+.complaint-form-wrapper {
+    padding: 2rem;
+    background: var(--secondary-light);
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+.complaint-form textarea {
+    width: 100%;
+    height: 120px;
+    background: var(--secondary);
+    border: 1px solid var(--glass-border);
+    color: var(--text-light);
+    padding: 1rem;
+    border-radius: 4px;
+    resize: none;
+    margin-bottom: 1rem;
+}
 
 /* Slot Booking UI */
-.slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem; }
-.slot-card { padding: 1rem; text-align: center; background: var(--secondary); border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
-.slot-card.available:hover { border-color: var(--primary); background: rgba(100, 255, 218, 0.1); }
-.slot-card.booked { opacity: 0.5; cursor: not-allowed; border-color: #ff6b6b; color: #ff6b6b; }
-.slot-card.selected { background: var(--primary); color: var(--secondary); border-color: var(--primary); font-weight: bold; transform: scale(1.05); }
+.slots-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.slot-card {
+    padding: 1rem;
+    text-align: center;
+    background: var(--secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slot-card.available:hover {
+    border-color: var(--primary);
+    background: rgba(100, 255, 218, 0.1);
+}
+
+.slot-card.booked {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+}
+
+.slot-card.selected {
+    background: var(--primary);
+    color: var(--secondary);
+    border-color: var(--primary);
+    font-weight: bold;
+    transform: scale(1.05);
+}
 
 /* Make Calendar Icon White */
-input[type='date']::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+input[type='date']::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
 
 /* FAQ Accordion */
-.faq-item { margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease; }
-.faq-question { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; }
-.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; padding: 0 0.5rem; color: var(--text-muted); }
-.faq-item.active .faq-answer { max-height: 200px; padding-bottom: 1rem; }
-.faq-item.active .faq-question i.fa-chevron-down { transform: rotate(180deg); transition: transform 0.3s; }
+.faq-item {
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 0.5rem;
+    color: var(--text-muted);
+}
+
+.faq-item.active .faq-answer {
+    max-height: 200px;
+    padding-bottom: 1rem;
+}
+
+.faq-item.active .faq-question i.fa-chevron-down {
+    transform: rotate(180deg);
+    transition: transform 0.3s;
+}
+
+/* ==================================
+   CALENDAR STYLES
+   ================================== */
+.calendar-container {
+    background: var(--secondary-light);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.calendar-header h3 {
+    margin: 0;
+    color: var(--primary);
+}
+
+.calendar-legend {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.dot {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.dot.green {
+    background-color: #64ffda;
+    box-shadow: 0 0 5px #64ffda;
+}
+
+.dot.red {
+    background-color: #ff6b6b;
+    box-shadow: 0 0 5px #ff6b6b;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.cal-day-header {
+    font-weight: bold;
+    color: var(--text-muted);
+    padding-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.cal-day {
+    padding: 0.8rem;
+    background: var(--secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    font-weight: 500;
+}
+
+.cal-day.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+}
+
+.cal-day.past {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.cal-day.green:hover {
+    border-color: #64ffda;
+    background: rgba(100, 255, 218, 0.1);
+    color: #64ffda;
+    transform: scale(1.05);
+}
+
+.cal-day.red {
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.cal-day.loading {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+.spinner {
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top: 3px solid var(--primary);
+    width: 30px;
+    height: 30px;
+    margin: 2rem auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
