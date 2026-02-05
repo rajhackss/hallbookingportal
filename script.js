@@ -342,28 +342,11 @@ function showHallDetails(id) {
                             <label>Contact</label>
                             <input type="tel" id="contact" required placeholder="Numbers only">
                         </div>
-                        <div class="payment-selection">
-                            <h4>Payment Method</h4>
-                            <div class="payment-options">
-                                <label class="radio-container">UPI
-                                    <input type="radio" name="payment" value="upi" checked onchange="togglePaymentDetails()"><span class="checkmark"></span>
-                                </label>
-                                <label class="radio-container">Card
-                                    <input type="radio" name="payment" value="card" onchange="togglePaymentDetails()"><span class="checkmark"></span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <!-- Dynamic Payment Details -->
-                        <div id="payment-details-section" style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 4px; text-align: center;">
-                            <!-- Default to UPI content -->
-                            <img src="upi_qr.png" alt="Scan to Pay" style="width: 350px; border-radius: 8px; margin-bottom: 0.5rem; border: 2px solid white;">
-                            <p style="font-size: 0.9rem; color: var(--primary);">Scan & Pay to Confirm</p>
-                            <input type="text" id="utrNumber" placeholder="Enter UTR / Transaction No." required 
-                                   style="width: 100%; padding: 0.8rem; margin-top: 0.5rem; border-radius: 4px; border: 1px solid var(--glass-border); background: var(--secondary); color: white;">
-                        </div>
 
-                        <button type="submit" class="btn btn-primary full-width" style="margin-top: 1rem;">Pay & Book</button>
+
+
+
+                        <button type="submit" class="btn btn-primary full-width" style="margin-top: 1rem;">Pay Now</button>
                     </form>
                 </div>
             </div>
@@ -484,26 +467,7 @@ function selectSlot(element, slot, date) {
 }
 
 // Handle Payment Method Toggle
-window.togglePaymentDetails = function () {
-    const method = document.querySelector('input[name="payment"]:checked').value;
-    const container = document.getElementById('payment-details-section');
 
-    if (method === 'upi') {
-        container.innerHTML = `
-            <img src="upi_qr.png" alt="Scan to Pay" style="width: 150px; border-radius: 8px; margin-bottom: 0.5rem; border: 2px solid white;">
-            <p style="font-size: 0.9rem; color: var(--primary);">Scan & Pay to Confirm</p>
-            <input type="text" id="utrNumber" placeholder="Enter 12-digit UTR No." required maxlength="12"
-                   oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()"
-                   style="width: 100%; padding: 0.8rem; margin-top: 0.5rem; border-radius: 4px; border: 1px solid var(--glass-border); background: var(--secondary); color: white; letter-spacing: 1px;">
-        `;
-    } else {
-        container.innerHTML = `
-            <i class="fas fa-credit-card" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-muted);"></i>
-            <p>Please pay at the Card Terminal at the venue office.</p>
-            <p style="font-size: 0.8rem; color: var(--text-muted);">Booking will be tentative until payment.</p>
-        `;
-    }
-};
 
 function initBookingForm() {
     const form = document.getElementById('bookingForm');
@@ -524,87 +488,78 @@ function initBookingForm() {
         });
     }
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const date = document.getElementById('checkDate').value;
         const name = nameInput.value;
         const contact = contactInput.value;
-        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-
-        if (!currentSlot) {
-            showNotification("Please select a time slot.", "error");
-            return;
-        }
-
-        if (contact.length < 10) {
-            showNotification("Contact number must be at least 10 digits.", "error");
-            return;
-        }
-        if (name.length < 2) {
-            showNotification("Please enter a valid name.", "error");
-            return;
-        }
-
-        // UTR Check
-        if (paymentMethod === 'upi') {
-            const utr = document.getElementById('utrNumber').value;
-            if (!utr || utr.length !== 12) {
-                showNotification("UTR number must be exactly 12 alphanumeric characters.", "error");
-                return;
-            }
-        }
-
+        // Redirect to Razorpay Link
         const btn = form.querySelector('button[type="submit"]');
-        btn.textContent = "Processing...";
+        btn.textContent = "Redirecting...";
         btn.disabled = true;
 
-        setTimeout(() => {
-            btn.textContent = "Pay & Book";
-            btn.disabled = false;
+        // Open link in new tab
+        window.open("https://rzp.io/rzp/kDgTqsL", "_blank");
 
-            // Register booking
-            if (!bookings[date]) bookings[date] = [];
-            bookings[date].push(currentSlot);
-
-            // Generate ID and Save Record
-            const bookingId = "HB-" + Math.floor(1000 + Math.random() * 9000);
-            bookingRecords.push({
-                id: bookingId,
-                hallId: currentHall.id,
-                date: date,
-                slot: currentSlot,
-                name: name,
-                status: "Confirmed"
-            });
-
-            showNotification(`Booking Confirmed! ID: ${bookingId}`);
-
-            // Show Success Modal / Details
-            const formContainer = document.getElementById('bookingFormContainer');
-            formContainer.innerHTML = `
-                <div style="text-align: center; padding: 2rem;">
-                    <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                    <h3>Booking Successful!</h3>
-                    <p style="font-size: 1.2rem; margin: 1rem 0;">Your Booking ID: <strong style="color: var(--primary);">${bookingId}</strong></p>
-                    <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; padding: 0.5rem; border-radius: 4px; margin: 1rem 0;">
-                        <p style="color: #ff6b6b; font-size: 0.9rem; margin: 0;"><strong>⚠️ IMPORTANT:</strong> Copy this Booking ID now.<br>You valid need it to <strong>Track Status</strong> or <strong>Cancel Booking</strong>.</p>
-                    </div>
-                    <button class="btn btn-secondary" onclick="showMyBookingsView()">Track Booking</button>
-                </div>
-            `;
-
-            // Reset UI
-            form.reset();
-            // Reset Payment UI
-            window.togglePaymentDetails();
-
-            document.getElementById('bookingFormContainer').classList.add('hidden');
-            document.getElementById('slotSelection').innerHTML = '';
-            document.getElementById('slotSelection').classList.add('hidden');
-            document.getElementById('checkDate').value = '';
-            document.getElementById('slotMessage').textContent = '';
-        }, 1500);
+        // Mark as booked locally (Optimistic update)
+        handleOfflineBooking(date, name, contact, "Online - Razorpay Link");
     });
+}
+
+function handleOfflineBooking(date, name, contact, type, refId = null) {
+    // Register booking
+    if (!bindings) var bindings = bookings; // Safety handling if variable name matches
+    if (!bookings[date]) bookings[date] = [];
+    bookings[date].push(currentSlot);
+
+    // Generate ID and Save Record
+    const bookingId = "HB-" + Math.floor(1000 + Math.random() * 9000);
+    bookingRecords.push({
+        id: bookingId,
+        hallId: currentHall.id,
+        date: date,
+        slot: currentSlot,
+        name: name,
+        status: "Confirmed",
+        paymentType: type,
+        refId: refId
+    });
+
+    showNotification(`Booking Confirmed! ID: ${bookingId}`);
+
+    // Show Success Modal / Details
+    const formContainer = document.getElementById('bookingFormContainer');
+    formContainer.innerHTML = `
+          <div style="text-align: center; padding: 2rem;">
+              <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--primary); margin-bottom: 1rem;"></i>
+              <h3>Booking Successful!</h3>
+              <p style="font-size: 1.2rem; margin: 1rem 0;">Your Booking ID: <strong style="color: var(--primary);">${bookingId}</strong></p>
+               <p>${type} ${refId ? `<br><span style="font-size:0.8rem">Ref: ${refId}</span>` : ''}</p>
+              <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; padding: 0.5rem; border-radius: 4px; margin: 1rem 0;">
+                  <p style="color: #ff6b6b; font-size: 0.9rem; margin: 0;"><strong>⚠️ IMPORTANT:</strong> Copy this Booking ID now.<br>You valid need it to <strong>Track Status</strong> or <strong>Cancel Booking</strong>.</p>
+              </div>
+              <button class="btn btn-secondary" onclick="showMyBookingsView()">Track Booking</button>
+          </div>
+      `;
+
+    // Reset UI
+    const form = document.getElementById('bookingForm');
+    if (form) form.reset();
+
+    // Reset Payment UI
+    if (window.togglePaymentDetails) window.togglePaymentDetails();
+
+    document.getElementById('bookingFormContainer').classList.add('hidden');
+    document.getElementById('slotSelection').innerHTML = '';
+    document.getElementById('slotSelection').classList.add('hidden');
+    document.getElementById('checkDate').value = '';
+    document.getElementById('slotMessage').textContent = '';
+
+    const checkBtn = document.getElementById('checkBtn');
+    if (checkBtn) {
+        checkBtn.textContent = "Check Availability";
+        checkBtn.disabled = false;
+    }
 }
 
 function initNav() {
@@ -831,4 +786,3 @@ window.showHome = showHome;
 window.showHallDetails = showHallDetails;
 window.showNotification = showNotification;
 window.showMyBookingsView = showMyBookingsView;
-
