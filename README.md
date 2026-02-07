@@ -6,6 +6,8 @@ A modern, responsive web application for booking halls and lawns for events like
 
 ---
 
+Live Link - https://hallbookingportal.vercel.app/
+
 ## ✨ Features
 
 ### 🏠 Core Functionality
@@ -224,8 +226,8 @@ define('RAZORPAY_KEY_SECRET', 'your_key_secret');
 
 ## 📞 Support
 
-- **Phone**: +91 8010253647
-- **Email**: vaishnavipatil1459@gmail.com
+- **Phone**: 
+- **Email**: 
 
 ---
 
@@ -245,3 +247,4 @@ This project is for educational and portfolio purposes.
 ---
 
 Made with ❤️ for seamless hall booking experiences.
+
